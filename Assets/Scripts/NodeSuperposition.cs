@@ -56,15 +56,22 @@ public class NodeSuperposition
 
     public bool TrySelectState()
     {
-        while (states.Count > 0)
+        while (states.Count > 1)
         {
             // This is where you can add biasing
             selectedState = states[UnityEngine.Random.Range(0, states.Count)];
+            //selectedState = states[0];
 
+            // Invalid State
             if (!TryUpdateAdjacentNodes())
                 states.Remove(selectedState);
-            else 
+            else
+            {
+                states.Clear();
+                states.Add(selectedState);
+                Debug.Log($"Collapsing {index} to {selectedState.name}");
                 return true;
+            }
         }
         return false;
     }
@@ -92,6 +99,7 @@ public class NodeSuperposition
 
             newStates.Add(adjStates);
         }
+
 
         // Neighbors have proper states
         UpdateAdjacentNodes(neighbors, newStates);
@@ -123,11 +131,11 @@ public class NodeSuperposition
         if (dir.x == -1)
             return (node1.X_Neg_Contact == node2.X_Pos_Contact);
 
-        // Going Up
+        // Going Forward
         if (dir.y == 1)
             return (node1.Z_Pos_Contact == node2.Z_Neg_Contact);
 
-        // Down
+        // Back
         if (dir.y == -1)
             return (node1.Z_Neg_Contact == node2.Z_Pos_Contact);
 
@@ -148,7 +156,7 @@ public class NodeSuperposition
             _states += state.name + ", \t";
         }
 
-        String _message = $"{_index}\nSelected State: {_selectedState}\nStates:\n{_states}\n";
+        String _message = $"{_index}\nSelected State: {_selectedState}\nStates: {_states}\n";
         
         return _message;
     }
