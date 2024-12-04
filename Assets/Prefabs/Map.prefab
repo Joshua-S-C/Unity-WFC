@@ -44,8 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bc8b53479b392243a675c5c221b8dde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  size: {x: 5, y: 5}
   cellSize: 1
   nodes:
-  - {fileID: 410987171935783410, guid: e0f0ceccc56ea724e98b12d484a7841b, type: 3}
-  - {fileID: 5713477614001988665, guid: 40f777026d6efb74a93bec34031d9234, type: 3}
+  - {fileID: 182056146310741629, guid: 207874f31537a1944b77c37b62329ff7, type: 3}
+  - {fileID: 182056146310741629, guid: f5cd44cf483ce0e408d5f9660c058b58, type: 3}

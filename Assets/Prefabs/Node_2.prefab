@@ -128,7 +128,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 165c859afa46f874ebed641792065724, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  X_Pos_Contact: 1
+  X_Pos_Contact: 0
   X_Neg_Contact: 0
   Z_Pos_Contact: 0
-  Z_Neg_Contact: 0
+  Z_Neg_Contact: 1
+  rot: 0
