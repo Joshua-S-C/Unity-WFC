@@ -15,7 +15,7 @@ public class Map : MonoBehaviour
 
     [SerializeField] bool step;
 
-    public Vector2Int size { get; private set; } = new Vector2Int(5, 5);
+    [SerializeField] public Vector2Int size;
     [SerializeField] float cellSize = 1;
     [SerializeField] MapNode[] nodes;
 
