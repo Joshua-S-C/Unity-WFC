@@ -3,7 +3,9 @@
 /// </summary>
 public enum ContactType
 {
-    EMPTY = 0,
-    CLOSED,
+    AIR = 0,
+    GROUND = 1,
+    EDGE, // TODO Fix edges going together regardless of orientation
+    EDGE_FLIPPED,
     END_CONTACT_TYPES
 }

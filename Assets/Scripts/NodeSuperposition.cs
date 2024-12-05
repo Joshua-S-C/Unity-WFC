@@ -57,6 +57,28 @@ public class NodeSuperposition
 
     public bool TrySelectState()
     {
+        while (states.Count > 1)
+        {
+            // This is where you can add biasing
+            selectedState = states[UnityEngine.Random.Range(0, states.Count)];;
+
+            // Invalid State
+            if (!TryUpdateAdjacentNodes())
+                states.Remove(selectedState);
+            else
+                {
+                    states.Clear();
+                    states.Add(selectedState);
+                    Debug.Log($"Collapsing {index} to {selectedState.name}");
+                    return true;
+                }
+        } 
+        return false;
+    }
+
+    /*    
+    public bool TrySelectState()
+    {
         // wait i dont need thi lol
         List<Tuple<GridRotation, bool>> rotation = new List<Tuple<GridRotation, bool>>{ 
             new Tuple<GridRotation, bool>(GridRotation._0, false), 
@@ -97,6 +119,7 @@ public class NodeSuperposition
         }
         return false;
     }
+    */
 
     private bool TryUpdateAdjacentNodes()
     {
@@ -122,7 +145,6 @@ public class NodeSuperposition
             newStates.Add(adjStates);
         }
 
-
         // Neighbors have proper states
         UpdateAdjacentNodes(neighbors, newStates);
 
@@ -142,26 +164,27 @@ public class NodeSuperposition
         }
     }
 
-    // TODO Update to account for rotations
+    // DONE Update to account for rotations
     private static bool CheckValidPair(MapNode node1, MapNode node2, Vector2Int dir)
     {
-        // TODO Update to use arrays of contact types
+        // DONE Update to use arrays of contact types
+        // TODO Actually dont do that
 
         // Going Right
-        if (dir == Vector2Int.right)
-            return MapNode.CheckValiContact(node1.X_Pos_Contact, node2.X_Neg_Contact);
+        if (dir == Vector2Int.left)
+            return MapNode.CheckValidContact(node1.X_Neg_Contact, node2.X_Pos_Contact, node1, node2);
 
         // Left
-        if (dir == Vector2Int.left)
-            return (node1.X_Neg_Contact == node2.X_Pos_Contact);
+        if (dir == Vector2Int.right)
+            return MapNode.CheckValidContact(node1.X_Pos_Contact, node2.X_Neg_Contact, node1, node2);
 
         // Going Forward
         if (dir == Vector2Int.up)
-            return (node1.Z_Pos_Contact == node2.Z_Neg_Contact);
+            return MapNode.CheckValidContact(node1.Z_Neg_Contact, node2.Z_Pos_Contact, node1, node2);
 
         // Back
         if (dir == Vector2Int.down)
-            return (node1.Z_Neg_Contact == node2.Z_Pos_Contact);
+            return MapNode.CheckValidContact(node1.Z_Pos_Contact, node2.Z_Neg_Contact, node1, node2);
 
         throw new Exception();
     }
@@ -187,6 +210,7 @@ public class NodeSuperposition
 
     public GameObject Create(Vector3 pos, Transform transform)
     {
-        return selectedState.Create(pos, transform, selectedRot);
+        return states[0].Create(pos, transform/*, selectedRot*/);
+        return selectedState.Create(pos, transform/*, selectedRot*/);
     }
 }

@@ -16,27 +16,43 @@ public enum GridRotation
 /// </summary>
 public class MapNode : MonoBehaviour
 {
-    // TODO Make these lists
-    [SerializeField] ContactType[] _X_Pos_Contact;
-    [SerializeField] ContactType[] _X_Neg_Contact;
-    [SerializeField] ContactType[] _Z_Pos_Contact;
-    [SerializeField] ContactType[] _Z_Neg_Contact;
+    // DONE Make these lists
+    [SerializeField] ContactType _X_Pos_Contact;
+    [SerializeField] ContactType _X_Neg_Contact;
+    [SerializeField] ContactType _Z_Pos_Contact;
+    [SerializeField] ContactType _Z_Neg_Contact;
+    //[SerializeField] bool _Mirror_X, _Mirror_Y;
 
-    public GridRotation rot;
+    [SerializeField] private GridRotation rot;
 
     public Quaternion creationRot
     {
         get
         {
+            return Quaternion.identity;
+
             Quaternion quat = Quaternion.identity;
             // this could very well be wrong
-            quat.y = (float)rot;
+            //quat.y = (int)rot;
+
+            switch (rot)
+            {   
+                case GridRotation._0: quat.y = 0; 
+                    break;
+                case GridRotation._90: quat.y = 90;
+                    break;
+                case GridRotation._180: quat.y = 180;
+                    break;
+                case GridRotation._270: quat.y = 270;
+                    break;
+            }
+
             return quat;
         }
         private set { }
     }
 
-    public ContactType[] X_Pos_Contact 
+    public ContactType X_Pos_Contact 
     { 
         get {
             switch (rot) {
@@ -50,7 +66,7 @@ public class MapNode : MonoBehaviour
         private set { } 
     }
 
-    public ContactType[] X_Neg_Contact
+    public ContactType X_Neg_Contact
     {
         get
         {
@@ -66,7 +82,7 @@ public class MapNode : MonoBehaviour
         private set { }
     }
 
-    public ContactType[] Z_Pos_Contact
+    public ContactType Z_Pos_Contact
     {
         get
         {
@@ -82,7 +98,7 @@ public class MapNode : MonoBehaviour
         private set { }
     }
 
-    public ContactType[] Z_Neg_Contact
+    public ContactType Z_Neg_Contact
     {
         get
         {
@@ -104,6 +120,18 @@ public class MapNode : MonoBehaviour
     /// <param name="pos">Map grid position</param>
     /// <param name="parent">The map's transform</param>
     /// <returns>The instantiated object</returns>
+    public GameObject Create(Vector3 pos, Transform parent)
+    {
+        return Instantiate(this, pos, creationRot, parent).gameObject;
+    }
+
+    // TEMP
+    /// <summary>
+    /// Creates the game object with appropriate params. To be called in map
+    /// </summary>
+    /// <param name="pos">Map grid position</param>
+    /// <param name="parent">The map's transform</param>
+    /// <returns>The instantiated object</returns>
     public GameObject Create(Vector3 pos, Transform parent, GridRotation rot)
     {
         this.rot = rot;
@@ -117,11 +145,33 @@ public class MapNode : MonoBehaviour
     /// <param name="node2"></param>
     /// <param name="dir"></param>
     /// <returns></returns>
-    public static bool CheckValiContact(ContactType[] n1C, ContactType[] n2C)
+    public static bool CheckValidContact(ContactType n1C, ContactType n2C, MapNode n1, MapNode n2)
     {
-        foreach (ContactType c in n2C)
-            if (n1C.ToList().Contains(c))
-                return true;
+        // Check edges
+        if(n1C == ContactType.EDGE)
+            return (n2C == ContactType.EDGE_FLIPPED);
+/*        if (n1C == ContactType.EDGE && n2C == ContactType.EDGE_FLIPPED || 
+            n2C == ContactType.EDGE && n1C == ContactType.EDGE_FLIPPED) 
+        {
+            return AreMapsFlipped(n1, n2);
+        }*/
+
+        return (n1C == n2C);
+
+        // TODO this is definitely stllnot right
+    }
+
+    public static bool AreMapsFlipped(MapNode n1, MapNode n2)
+    {
+        if (n1.rot == GridRotation._0 && n2.rot == GridRotation._180)
+            return true;
+        if (n1.rot == GridRotation._90 && n2.rot == GridRotation._270)
+            return true;
+        if (n1.rot == GridRotation._180 && n2.rot == GridRotation._0)
+            return true;
+        if (n1.rot == GridRotation._270 && n2.rot == GridRotation._90)
+            return true;
+
         return false;
     }
 }
