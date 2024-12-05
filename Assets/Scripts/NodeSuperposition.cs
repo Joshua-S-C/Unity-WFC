@@ -12,6 +12,7 @@ public class NodeSuperposition
     public List<MapNode> states { get; private set; }
 
     public MapNode selectedState = null;
+    private GridRotation selectedRot;
 
     public Vector2Int index { get; private set; }
 
@@ -56,22 +57,43 @@ public class NodeSuperposition
 
     public bool TrySelectState()
     {
+        // wait i dont need thi lol
+        List<Tuple<GridRotation, bool>> rotation = new List<Tuple<GridRotation, bool>>{ 
+            new Tuple<GridRotation, bool>(GridRotation._0, false), 
+            new Tuple<GridRotation, bool>(GridRotation._90, false), 
+            new Tuple<GridRotation, bool>(GridRotation._180, false), 
+            new Tuple<GridRotation, bool>(GridRotation._270, false), 
+        };
+
+
         while (states.Count > 1)
         {
+            List<GridRotation> rotations = new List<GridRotation>() { GridRotation._0, GridRotation._90, GridRotation._180, GridRotation._270};
+
             // This is where you can add biasing
             selectedState = states[UnityEngine.Random.Range(0, states.Count)];
-            //selectedState = states[0];
 
-            // Invalid State
-            if (!TryUpdateAdjacentNodes())
-                states.Remove(selectedState);
-            else
+            // Loop through rotations
+            while (rotations.Count > 0)
             {
-                states.Clear();
-                states.Add(selectedState);
-                Debug.Log($"Collapsing {index} to {selectedState.name}");
-                return true;
-            }
+                selectedRot = rotations[UnityEngine.Random.Range(0, rotations.Count)];
+                selectedState.rot = selectedRot;
+
+                // Invalid Rotation
+                if (!TryUpdateAdjacentNodes())
+                    rotations.Remove(selectedRot);
+                else
+                {
+                    states.Clear();
+                    states.Add(selectedState);
+                    Debug.Log($"Collapsing {index} to {selectedState.name}");
+                    return true;
+                }
+            } 
+
+            // State was invalid with all rotations
+            states.Remove(selectedState);
+
         }
         return false;
     }
@@ -123,20 +145,22 @@ public class NodeSuperposition
     // TODO Update to account for rotations
     private static bool CheckValidPair(MapNode node1, MapNode node2, Vector2Int dir)
     {
+        // TODO Update to use arrays of contact types
+
         // Going Right
-        if (dir.x == 1)
-            return (node1.X_Pos_Contact == node2.X_Neg_Contact);
+        if (dir == Vector2Int.right)
+            return MapNode.CheckValiContact(node1.X_Pos_Contact, node2.X_Neg_Contact);
 
         // Left
-        if (dir.x == -1)
+        if (dir == Vector2Int.left)
             return (node1.X_Neg_Contact == node2.X_Pos_Contact);
 
         // Going Forward
-        if (dir.y == 1)
+        if (dir == Vector2Int.up)
             return (node1.Z_Pos_Contact == node2.Z_Neg_Contact);
 
         // Back
-        if (dir.y == -1)
+        if (dir == Vector2Int.down)
             return (node1.Z_Neg_Contact == node2.Z_Pos_Contact);
 
         throw new Exception();
@@ -159,5 +183,10 @@ public class NodeSuperposition
         String _message = $"{_index}\nSelected State: {_selectedState}\nStates: {_states}\n";
         
         return _message;
+    }
+
+    public GameObject Create(Vector3 pos, Transform transform)
+    {
+        return selectedState.Create(pos, transform, selectedRot);
     }
 }

@@ -17,14 +17,14 @@ public class Map : MonoBehaviour
 
     [SerializeField] public Vector2Int size;
     [SerializeField] float cellSize = 1;
-    [SerializeField] MapNode[] nodes;
+    [SerializeField] List<MapNode> nodes;
 
     public NodeSuperposition[,] superPosMatrix { get; private set; }
     public NodeSuperposition[] superPosArray { get; private set; }
 
     void Start()
     {
-        Init();
+        InitMapMatrix();
 
         PrintSuperpositions();
         
@@ -32,6 +32,7 @@ public class Map : MonoBehaviour
         {
             Fill();
             Create();
+            PrintSuperpositions();
         }
     }
 
@@ -48,12 +49,10 @@ public class Map : MonoBehaviour
         }
     }
 
-
-
     /// <summary>
     /// Fills the map matrix with Nodes in Superposition, with all possible states avail
     /// </summary>
-    private void Init()
+    private void InitMapMatrix()
     {
         superPosMatrix = new NodeSuperposition[size.x, size.y];
 
@@ -101,7 +100,7 @@ public class Map : MonoBehaviour
             for (int j = 0; j < size.y; j++)
             {
                 Vector3 pos = new Vector3(cellSize * i, 0, cellSize * j);
-                Instantiate(superPosMatrix[i, j].states[0], pos, Quaternion.identity, transform);
+                superPosMatrix[i, j].Create(pos, transform);
             }
     }
 
